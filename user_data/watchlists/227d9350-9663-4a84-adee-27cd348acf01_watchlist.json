@@ -1,0 +1,19 @@
+{
+  "user_id": "227d9350-9663-4a84-adee-27cd348acf01",
+  "created_at": "2025-09-28T21:32:26.405095",
+  "updated_at": "2025-11-12T18:56:38.546101",
+  "stocks": [
+    {
+      "symbol": "BEL",
+      "name": "Bharat Electronics Limited",
+      "sector": "Defense",
+      "added_at": "2025-09-30T21:28:20.694666"
+    },
+    {
+      "symbol": "RELIANCE",
+      "name": "Reliance Industries Limited",
+      "sector": "Oil & Gas",
+      "added_at": "2025-11-12T18:56:38.546101"
+    }
+  ]
+}

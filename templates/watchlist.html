@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📈 {{ username }}'s Watchlist - Stock Market Intelligence</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            margin: 2rem auto;
+            padding: 2rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .search-container {
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 2px solid #e9ecef;
+        }
+        
+        .search-input-group {
+            position: relative;
+        }
+        
+        .search-input {
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            padding-right: 120px;
+        }
+        
+        .search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .search-add-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .search-add-btn:hover {
+            background: linear-gradient(45deg, #20c997, #28a745);
+            transform: translateY(-50%) translateY(-2px);
+            color: white;
+        }
+        
+        .search-add-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: translateY(-50%);
+        }
+        
+        .watchlist-item {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-left: 5px solid #667eea;
+        }
+        
+        .watchlist-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .price-positive { color: #28a745; font-weight: bold; }
+        .price-negative { color: #dc3545; font-weight: bold; }
+        .price-neutral { color: #6c757d; font-weight: bold; }
+        
+        .news-section {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-card {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .sector-badge {
+            background: rgba(102, 126, 234, 0.15);
+            color: #667eea;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .empty-watchlist {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+        
+        .loading-spinner {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .nav-link {
+            color: #333 !important;
+            font-weight: 500;
+        }
+        
+        .nav-link:hover {
+            color: #667eea !important;
+        }
+        
+        .sector-tabs .nav-link {
+            background: rgba(255,255,255,0.8);
+            border-radius: 10px 10px 0 0;
+            margin-right: 0.5rem;
+            color: #666;
+            font-weight: 500;
+            border: none;
+        }
+        
+        .sector-tabs .nav-link.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+        }
+        
+        .positive-stocks, .negative-stocks {
+            background: rgba(255,255,255,0.8);
+            border-radius: 10px;
+            padding: 1rem;
+            min-height: 300px;
+        }
+        
+        .positive-stocks {
+            border-left: 4px solid #28a745;
+        }
+        
+        .negative-stocks {
+            border-left: 4px solid #dc3545;
+        }
+        
+        .stock-news-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .stock-news-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        
+        .stock-symbol {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-chart-line"></i> Stock Intelligence
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link fw-bold" href="/">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a class="nav-link fw-bold text-primary" href="/watchlist">
+                    <i class="fas fa-heart text-danger"></i> Watchlist
+                </a>
+                <a class="nav-link" href="/logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout ({{ username }})
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="main-container">
+            <!-- Header with User Info -->
+            <div class="row align-items-center mb-4">
+                <div class="col-md-6">
+                    <h2><i class="fas fa-heart text-danger"></i> {{ username }}'s Personal Watchlist</h2>
+                    <p class="text-muted mb-0">Your personalized stock tracking dashboard</p>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="fw-bold fs-4" id="totalStocks">{{ watchlist_count }}</div>
+                        <small>Stocks Tracked</small>
+                    </div>
+                </div>
+                <div class="col-md-3 text-end">
+                    <button class="btn btn-info btn-sm mb-2" onclick="window.location.href='/logout'">
+                        <i class="fas fa-users"></i> Switch Account
+                    </button>
+                    <div class="small text-muted">
+                        <i class="fas fa-shield-alt"></i> Private & Secure
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stock Search Section -->
+            <div class="search-container">
+                <h5><i class="fas fa-search"></i> Add Stocks to Your Watchlist</h5>
+                <p class="text-muted mb-3">Search by symbol (e.g., BEL) or company name (e.g., Bharat Electronics)</p>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="search-input-group">
+                            <input type="text" 
+                                   class="form-control search-input" 
+                                   id="stockSearch" 
+                                   placeholder="Type 'BEL' or 'Bharat Electronics' and click Add..."
+                                   autocomplete="off">
+                            <button class="search-add-btn" id="directAddBtn" onclick="quickAddStock()" disabled>
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Watchlist Column -->
+                <div class="col-lg-6">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5><i class="fas fa-list"></i> Your Personal Stocks</h5>
+                        <div>
+                            <button class="btn btn-primary btn-sm me-2" onclick="refreshWatchlist()">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                            <button class="btn btn-warning btn-sm" onclick="clearAllStocks()">
+                                <i class="fas fa-trash"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="watchlistContainer">
+                        <div class="loading-spinner">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <p class="mt-2 text-muted">Loading {{ username }}'s watchlist...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- News Column with Sector Tabs -->
+                <div class="col-lg-6">
+                    <div class="news-section">
+                        <h5><i class="fas fa-newspaper"></i> Sector News for {{ username }}'s Stocks</h5>
+                        
+                        <!-- Sector Tabs -->
+                        {% if watchlist_tabs_data %}
+                        <ul class="nav nav-tabs sector-tabs mt-3" id="watchlistSectorTabs" role="tablist">
+                            {% for sector in watchlist_tabs_data %}
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link {% if loop.first %}active{% endif %}" 
+                                        id="wt-tab-{{ sector|replace(' ', '_') }}-tab"
+                                        data-bs-toggle="tab" 
+                                        data-bs-target="#wt-tab-{{ sector|replace(' ', '_') }}" 
+                                        type="button" role="tab">
+                                    {{ sector }}
+                                </button>
+                            </li>
+                            {% endfor %}
+                        </ul>
+
+                        <div class="tab-content mt-3">
+                            {% for sector, data in watchlist_tabs_data.items() %}
+                            <div class="tab-pane fade {% if loop.first %}show active{% endif %}" 
+                                 id="wt-tab-{{ sector|replace(' ', '_') }}" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="positive-stocks">
+                                            <h6><i class="fas fa-arrow-up text-success"></i> Likely Up</h6>
+                                            {% if data.positive %}
+                                                {% for item in data.positive %}
+                                                <div class="stock-news-card border-success">
+                                                    <span class="stock-symbol">{{ item.symbol }}</span>
+                                                    <h6 class="text-success mt-2 mb-2">
+                                                        <a href="{{ item.url }}" target="_blank" class="text-decoration-none">
+                                                            {{ item.title[:60] }}...
+                                                        </a>
+                                                    </h6>
+                                                    <p class="small text-muted mb-2">{{ item.summary[:100] }}...</p>
+                                                </div>
+                                                {% endfor %}
+                                            {% else %}
+                                                <p class="text-muted small">No positive news</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="negative-stocks">
+                                            <h6><i class="fas fa-arrow-down text-danger"></i> Likely Down</h6>
+                                            {% if data.negative %}
+                                                {% for item in data.negative %}
+                                                <div class="stock-news-card border-danger">
+                                                    <span class="stock-symbol">{{ item.symbol }}</span>
+                                                    <h6 class="text-danger mt-2 mb-2">
+                                                        <a href="{{ item.url }}" target="_blank" class="text-decoration-none">
+                                                            {{ item.title[:60] }}...
+                                                        </a>
+                                                    </h6>
+                                                    <p class="small text-muted mb-2">{{ item.summary[:100] }}...</p>
+                                                </div>
+                                                {% endfor %}
+                                            {% else %}
+                                                <p class="text-muted small">No negative news</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-newspaper text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-3">Add stocks to see personalized news</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="actionToast" class="toast" role="alert">
+            <div class="toast-header">
+                <i class="fas fa-info-circle text-primary me-2"></i>
+                <strong class="me-auto">{{ username }}'s Watchlist</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toastMessage"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const currentUsername = '{{ username }}';
+        let searchTimeout;
+        const toast = new bootstrap.Toast(document.getElementById('actionToast'));
+
+        // Stock Database for local search
+        const stockDatabase = [
+            { symbol: 'HDFCBANK', name: 'HDFC Bank Limited', sector: 'Banking', industry: 'Private Bank' },
+            { symbol: 'ICICIBANK', name: 'ICICI Bank Limited', sector: 'Banking', industry: 'Private Bank' },
+            { symbol: 'SBIN', name: 'State Bank of India', sector: 'Banking', industry: 'Public Bank' },
+            { symbol: 'BEL', name: 'Bharat Electronics Limited', sector: 'Defense', industry: 'Electronics' },
+            { symbol: 'TCS', name: 'Tata Consultancy Services', sector: 'IT', industry: 'IT Services' },
+            { symbol: 'INFY', name: 'Infosys Limited', sector: 'IT', industry: 'IT Services' },
+            { symbol: 'RELIANCE', name: 'Reliance Industries Limited', sector: 'Oil & Gas', industry: 'Diversified' },
+            { symbol: 'LIC', name: 'Life Insurance Corporation of India', sector: 'Insurance', industry: 'Life Insurance' },
+            { symbol: 'WIPRO', name: 'Wipro Limited', sector: 'IT', industry: 'IT Services' },
+            { symbol: 'AXISBANK', name: 'Axis Bank Limited', sector: 'Banking', industry: 'Private Bank' },
+            { symbol: 'KOTAKBANK', name: 'Kotak Mahindra Bank', sector: 'Banking', industry: 'Private Bank' },
+            { symbol: 'ONGC', name: 'Oil and Natural Gas Corporation', sector: 'Oil & Gas', industry: 'Exploration' },
+            { symbol: 'HAL', name: 'Hindustan Aeronautics Limited', sector: 'Defense', industry: 'Aerospace' }
+        ];
+
+        function searchStocksLocally(query) {
+            const queryLower = query.toLowerCase().trim();
+            if (queryLower.length < 2) return [];
+
+            return stockDatabase.filter(stock => 
+                stock.symbol.toLowerCase().includes(queryLower) || 
+                stock.name.toLowerCase().includes(queryLower)
+            ).slice(0, 10);
+        }
+
+        function showToast(message, type = 'info') {
+            document.getElementById('toastMessage').innerHTML = message;
+            const toastHeader = document.querySelector('#actionToast .toast-header i');
+            toastHeader.className = `fas fa-${type === 'success' ? 'check-circle text-success' : type === 'error' ? 'exclamation-triangle text-danger' : 'info-circle text-primary'} me-2`;
+            toast.show();
+        }
+
+        // Stock search functionality
+        document.getElementById('stockSearch').addEventListener('input', function() {
+            const query = this.value.trim();
+            const addButton = document.getElementById('directAddBtn');
+            
+            clearTimeout(searchTimeout);
+            
+            if (query.length < 2) {
+                addButton.disabled = true;
+                addButton.innerHTML = '<i class="fas fa-plus"></i> Add';
+                return;
+            }
+            
+            searchTimeout = setTimeout(() => {
+                const results = searchStocksLocally(query);
+                
+                if (results.length > 0) {
+                    const bestMatch = results[0];
+                    addButton.innerHTML = `<i class="fas fa-plus"></i> Add ${bestMatch.symbol}`;
+                    addButton.disabled = false;
+                } else {
+                    addButton.innerHTML = '<i class="fas fa-plus"></i> Add';
+                    addButton.disabled = true;
+                }
+            }, 300);
+        });
+
+        document.getElementById('stockSearch').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                quickAddStock();
+            }
+        });
+
+        function quickAddStock() {
+            const query = document.getElementById('stockSearch').value.trim();
+            
+            if (query.length < 2) {
+                showToast('Please enter at least 2 characters', 'error');
+                return;
+            }
+
+            const results = searchStocksLocally(query);
+            
+            if (results.length === 0) {
+                showToast(`No stocks found for "${query}"`, 'error');
+                return;
+            }
+
+            const stockToAdd = results[0];
+            const addButton = document.getElementById('directAddBtn');
+            addButton.disabled = true;
+            addButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+            
+            // Call SERVER API to add stock
+            fetch('/api/add_to_watchlist', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    symbol: stockToAdd.symbol,
+                    name: stockToAdd.name,
+                    sector: stockToAdd.sector
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(`✅ ${stockToAdd.symbol} added!`, 'success');
+                    document.getElementById('stockSearch').value = '';
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    showToast(data.error || 'Error adding stock', 'error');
+                    addButton.disabled = false;
+                    addButton.innerHTML = '<i class="fas fa-plus"></i> Add';
+                }
+            })
+            .catch(err => {
+                showToast('Network error', 'error');
+                addButton.disabled = false;
+                addButton.innerHTML = '<i class="fas fa-plus"></i> Add';
+            });
+        }
+
+        function removeFromWatchlist(symbol) {
+            if (!confirm(`Remove ${symbol}?`)) return;
+
+            fetch('/api/remove_from_watchlist', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({symbol: symbol})
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(`${symbol} removed`, 'success');
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    showToast(data.error || 'Error removing stock', 'error');
+                }
+            })
+            .catch(err => showToast('Network error', 'error'));
+        }
+
+        function clearAllStocks() {
+            if (!confirm(`Remove all stocks from ${currentUsername}'s watchlist?`)) return;
+            
+            // Get all stocks and remove them one by one
+            fetch('/api/get_watchlist')
+            .then(res => res.json())
+            .then(data => {
+                if (data.stocks && data.stocks.length > 0) {
+                    let promises = data.stocks.map(stock => 
+                        fetch('/api/remove_from_watchlist', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({symbol: stock.symbol})
+                        })
+                    );
+                    
+                    Promise.all(promises).then(() => {
+                        showToast('All stocks removed', 'success');
+                        setTimeout(() => location.reload(), 800);
+                    });
+                }
+            });
+        }
+
+        // Load watchlist from SERVER
+        function refreshWatchlist() {
+            document.getElementById('watchlistContainer').innerHTML = `
+                <div class="loading-spinner">
+                    <div class="spinner-border text-primary"></div>
+                    <p class="mt-2 text-muted">Loading watchlist...</p>
+                </div>
+            `;
+
+            fetch('/api/get_watchlist')
+            .then(res => res.json())
+            .then(data => {
+                if (data.stocks) {
+                    displayWatchlist(data.stocks);
+                    document.getElementById('totalStocks').textContent = data.total_stocks;
+                } else {
+                    displayWatchlist([]);
+                }
+            })
+            .catch(err => {
+                console.error('Error loading watchlist:', err);
+                displayWatchlist([]);
+            });
+        }
+
+        function displayWatchlist(stocks) {
+            const container = document.getElementById('watchlistContainer');
+            
+            if (stocks.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-watchlist">
+                        <i class="fas fa-heart-broken text-muted" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">${currentUsername}'s watchlist is empty</h5>
+                        <p>Add stocks to start tracking</p>
+                        <div class="mt-3">
+                            <span class="badge bg-info me-2">Try: BEL</span>
+                            <span class="badge bg-info me-2">TCS</span>
+                            <span class="badge bg-info">RELIANCE</span>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            stocks.forEach(stock => {
+                const priceClass = stock.percent_change > 0 ? 'price-positive' : 
+                                 stock.percent_change < 0 ? 'price-negative' : 'price-neutral';
+                const priceIcon = stock.percent_change > 0 ? 'fa-arrow-up' : 
+                                stock.percent_change < 0 ? 'fa-arrow-down' : 'fa-minus';
+
+                html += `
+                    <div class="watchlist-item">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <div class="fw-bold fs-6 text-primary">${stock.symbol}</div>
+                                <div class="text-dark small">${stock.name}</div>
+                                <div class="small">
+                                    <span class="sector-badge">${stock.sector}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <div class="fw-bold">₹${stock.price}</div>
+                                <div class="${priceClass} small">
+                                    <i class="fas ${priceIcon}"></i> ${stock.percent_change.toFixed(1)}%
+                                </div>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <button class="btn btn-danger btn-sm" onclick="removeFromWatchlist('${stock.symbol}')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log(`📈 Loading ${currentUsername}'s personal watchlist...`);
+            refreshWatchlist();
+            showToast(`Welcome ${currentUsername}!`, 'info');
+        });
+    </script>
+</body>
+</html>

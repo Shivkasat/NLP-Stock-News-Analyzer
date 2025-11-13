@@ -1,0 +1,16 @@
+{
+  "Shivkasat": {
+    "id": "227d9350-9663-4a84-adee-27cd348acf01",
+    "password": "scrypt:32768:8:1$0CxDGIAVaIM6EFiN$ee2c452050f08c357e6669d686c32d6ae23f210e6a00f2888904cc40c80f86db317803a18e662126d63735f2b119f681679c8d6aa257a97dc806315f3763ab04",
+    "email": "SHIVKASAT477@GMAIL.COM",
+    "created_at": "2025-09-28T21:32:26.402082",
+    "watchlist_file": "user_data/watchlists/227d9350-9663-4a84-adee-27cd348acf01_watchlist.json"
+  },
+  "Harsh": {
+    "id": "ab664f98-a8c3-4c3b-b076-6ad9f2871bd5",
+    "password": "scrypt:32768:8:1$L5hn6LI5mkpv6pl4$098fee2a6e98db5af2488a851fa2bd1fa4f7c721243a06ebe29461b75c1cd43c210f5393d4e5845674574c71050817d0d70c54c7c2cc9ddbf0e83c13b982849a",
+    "email": "mahisota08@gmail.com",
+    "created_at": "2025-09-28T21:57:04.197822",
+    "watchlist_file": "user_data/watchlists/ab664f98-a8c3-4c3b-b076-6ad9f2871bd5_watchlist.json"
+  }
+}

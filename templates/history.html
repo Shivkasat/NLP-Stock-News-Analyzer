@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 News History - Stock Market Intelligence</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            margin: 2rem auto;
+            padding: 2rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .filter-container {
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 2px solid #e9ecef;
+        }
+        
+        .stats-card {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 15px;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        
+        .news-article-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-left: 5px solid #667eea;
+        }
+        
+        .news-article-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .news-article-card.positive { border-left-color: #28a745; }
+        .news-article-card.negative { border-left-color: #dc3545; }
+        .news-article-card.neutral { border-left-color: #6c757d; }
+        
+        .sentiment-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .sentiment-badge.positive { background: rgba(40, 167, 69, 0.15); color: #28a745; }
+        .sentiment-badge.negative { background: rgba(220, 53, 69, 0.15); color: #dc3545; }
+        .sentiment-badge.neutral { background: rgba(108, 117, 125, 0.15); color: #6c757d; }
+        
+        .stock-mention-tag {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            margin: 0.2rem;
+            display: inline-block;
+        }
+        
+        .keyword-tag {
+            background: rgba(102, 126, 234, 0.15);
+            color: #667eea;
+            padding: 0.2rem 0.5rem;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            margin: 0.2rem;
+            display: inline-block;
+        }
+        
+        .filter-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border: none;
+            color: white;
+            border-radius: 10px;
+            padding: 0.5rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .clear-btn {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            border: none;
+            color: white;
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+        }
+        
+        .loading-spinner {
+            text-align: center;
+            padding: 3rem;
+        }
+        
+        .nav-link {
+            color: #333 !important;
+            font-weight: 500;
+        }
+        
+        .nav-link:hover {
+            color: #667eea !important;
+        }
+        
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2rem;
+        }
+        
+        .export-btn {
+            background: linear-gradient(45deg, #17a2b8, #138496);
+            border: none;
+            color: white;
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-chart-line"></i> Stock Intelligence
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link fw-bold" href="/">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a class="nav-link fw-bold" href="/watchlist">
+                    <i class="fas fa-heart text-danger"></i> Watchlist
+                </a>
+                <a class="nav-link fw-bold text-primary" href="/history">
+                    <i class="fas fa-history"></i> News History
+                </a>
+                <a class="nav-link" href="/logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout ({{ username }})
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="main-container">
+            <!-- Header -->
+            <div class="row align-items-center mb-4">
+                <div class="col-md-8">
+                    <h2><i class="fas fa-history"></i> News History & Archive</h2>
+                    <p class="text-muted mb-0">Search through all previously collected market news with advanced filters</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button class="btn export-btn" onclick="exportNews()">
+                        <i class="fas fa-download"></i> Export Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="row mb-4" id="statsContainer">
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="fs-4 fw-bold" id="totalArticles">0</div>
+                        <small>Total Articles</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="fs-4 fw-bold" id="recentArticles">0</div>
+                        <small>Last 7 Days</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="fs-4 fw-bold" id="uniqueSectors">0</div>
+                        <small>Sectors Covered</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="fs-4 fw-bold" id="filteredResults">0</div>
+                        <small>Current Results</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Filters -->
+            <div class="filter-container">
+                <h5><i class="fas fa-filter"></i> Advanced Filters</h5>
+                <div class="row">
+                    <div class="col-md-3">
+                        <label class="form-label">Date Range</label>
+                        <input type="date" class="form-control" id="dateFrom" onchange="applyFilters()">
+                        <input type="date" class="form-control mt-2" id="dateTo" onchange="applyFilters()">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Sector</label>
+                        <select class="form-select" id="sectorFilter" onchange="applyFilters()">
+                            <option value="all">All Sectors</option>
+                            <option value="Banking">Banking</option>
+                            <option value="IT">IT</option>
+                            <option value="Oil & Gas">Oil & Gas</option>
+                            <option value="Pharma">Pharma</option>
+                            <option value="Auto">Auto</option>
+                            <option value="FMCG">FMCG</option>
+                            <option value="Metals">Metals</option>
+                            <option value="Infrastructure">Infrastructure</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Sentiment</label>
+                        <select class="form-select" id="sentimentFilter" onchange="applyFilters()">
+                            <option value="all">All Sentiments</option>
+                            <option value="Positive">Positive</option>
+                            <option value="Negative">Negative</option>
+                            <option value="Neutral">Neutral</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Stock Symbol</label>
+                        <input type="text" class="form-control" id="stockFilter" placeholder="e.g., TCS, BEL" onchange="applyFilters()">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Search Keywords</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="searchFilter" placeholder="Search in title/description">
+                            <button class="btn filter-btn" onclick="applyFilters()">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button class="btn clear-btn me-2" onclick="clearFilters()">
+                            <i class="fas fa-times"></i> Clear All Filters
+                        </button>
+                        <span class="text-muted small">
+                            <i class="fas fa-info-circle"></i> 
+                            Use filters to narrow down your search through thousands of archived news articles
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- News Articles -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5><i class="fas fa-newspaper"></i> Historical News Articles</h5>
+                        <div>
+                            <select class="form-select d-inline-block" style="width: auto;" id="limitFilter" onchange="applyFilters()">
+                                <option value="25">25 Articles</option>
+                                <option value="50" selected>50 Articles</option>
+                                <option value="100">100 Articles</option>
+                                <option value="200">200 Articles</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="newsContainer">
+                        <div class="loading-spinner">
+                            <div class="spinner-border text-primary mb-3" role="status"></div>
+                            <p class="text-muted">Loading news history...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentFilters = {};
+
+        // Apply filters and fetch news
+        function applyFilters() {
+            const filters = {
+                date_from: document.getElementById('dateFrom').value,
+                date_to: document.getElementById('dateTo').value,
+                sector: document.getElementById('sectorFilter').value,
+                sentiment: document.getElementById('sentimentFilter').value,
+                stock: document.getElementById('stockFilter').value,
+                search: document.getElementById('searchFilter').value,
+                limit: document.getElementById('limitFilter').value
+            };
+
+            // Remove empty filters
+            currentFilters = Object.fromEntries(
+                Object.entries(filters).filter(([_, v]) => v !== '' && v !== 'all')
+            );
+
+            loadNewsHistory();
+        }
+
+        // Clear all filters
+        function clearFilters() {
+            document.getElementById('dateFrom').value = '';
+            document.getElementById('dateTo').value = '';
+            document.getElementById('sectorFilter').value = 'all';
+            document.getElementById('sentimentFilter').value = 'all';
+            document.getElementById('stockFilter').value = '';
+            document.getElementById('searchFilter').value = '';
+            
+            currentFilters = {};
+            loadNewsHistory();
+        }
+
+        // Load news history with current filters
+        function loadNewsHistory() {
+            document.getElementById('newsContainer').innerHTML = `
+                <div class="loading-spinner">
+                    <div class="spinner-border text-primary mb-3" role="status"></div>
+                    <p class="text-muted">Searching news history...</p>
+                </div>
+            `;
+
+            // Build query string
+            const queryParams = new URLSearchParams(currentFilters).toString();
+            const url = `/api/news_history${queryParams ? '?' + queryParams : ''}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    updateStatistics(data.statistics);
+                    displayNewsArticles(data.articles);
+                    document.getElementById('filteredResults').textContent = data.total_found;
+                })
+                .catch(error => {
+                    console.error('Error loading news history:', error);
+                    document.getElementById('newsContainer').innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Failed to load news history. Please try again.
+                        </div>
+                    `;
+                });
+        }
+
+        // Update statistics display
+        function updateStatistics(stats) {
+            document.getElementById('totalArticles').textContent = stats.total_articles || 0;
+            document.getElementById('recentArticles').textContent = stats.recent_articles || 0;
+            document.getElementById('uniqueSectors').textContent = Object.keys(stats.sector_stats || {}).length;
+        }
+
+        // Display news articles
+        function displayNewsArticles(articles) {
+            const container = document.getElementById('newsContainer');
+
+            if (articles.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-search text-muted" style="font-size: 4rem;"></i>
+                        <h4 class="mt-3">No articles found</h4>
+                        <p class="text-muted">Try adjusting your filters or check back later for more news</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            articles.forEach(article => {
+                const sentimentClass = article.sentiment.toLowerCase();
+                const publishedDate = new Date(article.published_date).toLocaleDateString();
+                const publishedTime = new Date(article.published_date).toLocaleTimeString();
+
+                html += `
+                    <div class="news-article-card ${sentimentClass}">
+                        <div class="row">
+                            <div class="col-md-9">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="mb-1 text-primary">${article.title}</h6>
+                                    <span class="sentiment-badge ${sentimentClass}">
+                                        ${article.sentiment}
+                                    </span>
+                                </div>
+                                
+                                <p class="text-muted small mb-2">${article.summary || article.description.substring(0, 200) + '...'}</p>
+                                
+                                <div class="mb-2">
+                                    <span class="badge bg-primary me-2">
+                                        <i class="fas fa-industry"></i> ${article.sector}
+                                    </span>
+                                    <span class="badge bg-secondary me-2">
+                                        <i class="fas fa-newspaper"></i> ${article.source}
+                                    </span>
+                                    <span class="badge bg-info">
+                                        <i class="fas fa-clock"></i> ${publishedDate}
+                                    </span>
+                                </div>
+                                
+                                ${article.stocks_mentioned.length > 0 ? `
+                                <div class="mb-2">
+                                    <small class="text-muted me-2">Stocks:</small>
+                                    ${article.stocks_mentioned.map(stock => 
+                                        `<span class="stock-mention-tag">${stock}</span>`
+                                    ).join('')}
+                                </div>
+                                ` : ''}
+                                
+                                ${article.keywords.length > 0 ? `
+                                <div class="mb-2">
+                                    <small class="text-muted me-2">Keywords:</small>
+                                    ${article.keywords.slice(0, 5).map(keyword => 
+                                        `<span class="keyword-tag">${keyword}</span>`
+                                    ).join('')}
+                                </div>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="col-md-3 text-end">
+                                <div class="mb-2">
+                                    <small class="text-muted d-block">Published</small>
+                                    <small class="fw-bold">${publishedTime}</small>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <small class="text-muted d-block">Sentiment Score</small>
+                                    <small class="fw-bold">${(article.sentiment_score * 100).toFixed(0)}%</small>
+                                </div>
+                                
+                                <a href="${article.url}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-external-link-alt"></i> Read Full
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Export news data
+        function exportNews() {
+            const queryParams = new URLSearchParams(currentFilters).toString();
+            window.open(`/api/news_history?${queryParams}&export=csv`, '_blank');
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default date range (last 30 days)
+            const today = new Date();
+            const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
+            
+            document.getElementById('dateTo').value = today.toISOString().split('T')[0];
+            document.getElementById('dateFrom').value = thirtyDaysAgo.toISOString().split('T')[0];
+            
+            // Load initial data
+            applyFilters();
+            
+            console.log('📚 News History page loaded successfully!');
+        });
+
+        // Search on Enter key
+        document.getElementById('searchFilter').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                applyFilters();
+            }
+        });
+        
+        document.getElementById('stockFilter').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                applyFilters();
+            }
+        });
+    </script>
+</body>
+</html>
