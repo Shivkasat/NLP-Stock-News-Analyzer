@@ -12,5 +12,11 @@
     "email": "mahisota08@gmail.com",
     "created_at": "2025-09-28T21:57:04.197822",
     "watchlist_file": "user_data/watchlists/ab664f98-a8c3-4c3b-b076-6ad9f2871bd5_watchlist.json"
+  },
+  "Kaizo": {
+    "id": "b96a2526-52de-485d-a18b-6e559c2633d0",
+    "password": "scrypt:32768:8:1$LiR9D9gd1g4OUNjt$3edda2f2daec57490db8623a1ecb005efbef0df43e927509f95271df099d20bf4406bacc5c656eca3d8483071c610f669bba73aff358aa890bdcca5844540513",
+    "email": "4mrashi@gmail.com",
+    "created_at": "2025-11-14T16:11:59.357359"
   }
 }

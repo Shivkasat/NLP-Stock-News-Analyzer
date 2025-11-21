@@ -18,6 +18,10 @@ import queue
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
 import os
+import socket
+
+# PRODUCTION FIX: Set global timeout for all network operations
+socket.setdefaulttimeout(15)
 
 app = Flask(__name__)
 
@@ -43,7 +47,6 @@ try:
     company_df.columns = company_df.columns.str.strip()
     company_df = company_df.dropna(subset=['COMPANY_NAME', 'SECTOR'])
     
-    # Create valid symbols set and company name to symbol mapping
     VALID_INDIAN_SYMBOLS = set(company_df['SYMBOL'].str.upper().tolist())
     COMPANY_TO_SYMBOL = {}
     for idx, row in company_df.iterrows():
@@ -67,10 +70,9 @@ except Exception as e:
         'bharat electronics': 'BEL'
     }
 
-# NO AI MODELS - Fast & Stable
-print("📝 Using SMART EXTRACTIVE summarization (no AI models - fast & stable)")
+print("📝 Using SMART EXTRACTIVE summarization (fast & production-ready)")
 
-# **USER MANAGEMENT**
+# USER MANAGEMENT
 def load_users():
     try:
         with open('user_data/users.json', 'r') as f:
@@ -189,7 +191,7 @@ def get_stock_price(symbol):
         'status': 'demo_data'
     }
 
-# **ENHANCED SECTOR KEYWORDS**
+# ENHANCED SECTOR KEYWORDS
 ENHANCED_SECTOR_KEYWORDS = {
     "Banking": {
         "companies": [
@@ -405,97 +407,16 @@ ENHANCED_SECTOR_KEYWORDS = {
 }
 
 ENHANCED_RSS_FEEDS = {
-    # Economic Times
     "economic_times_market": "https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms",
     "economic_times_stocks": "https://economictimes.indiatimes.com/markets/stocks/rssfeeds/2146842.cms",
-    
-    # Moneycontrol
     "moneycontrol": "https://www.moneycontrol.com/rss/business.xml",
     "moneycontrol_news": "https://www.moneycontrol.com/rss/latestnews.xml",
-    
-    # Business Standard
     "business_standard": "https://www.business-standard.com/rss/markets-106.rss",
-    
-    # Financial Express
     "financial_express": "https://www.financialexpress.com/market/feed/",
-    
-    # Livemint
     "livemint": "https://www.livemint.com/rss/markets",
-    
-    # Zee Business
     "zeebiz": "https://www.zeebiz.com/rss/markets.xml",
-    
-    # Google News
     "google_india_stocks": "https://news.google.com/rss/search?q=indian%20stocks&hl=en-IN&gl=IN&ceid=IN:en",
     "google_sensex": "https://news.google.com/rss/search?q=sensex&hl=en-IN&gl=IN&ceid=IN:en",
-        # Economic Times
-    "economic_times_market": "https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms",
-    "economic_times_stocks": "https://economictimes.indiatimes.com/markets/stocks/rssfeeds/2146842.cms",
-    "economic_times_ipos": "https://economictimes.indiatimes.com/markets/ipo/rssfeeds/67812142.cms",
-    "economic_times_commodities": "https://economictimes.indiatimes.com/markets/commodities/rssfeeds/1808152121.cms",
-    
-    # Moneycontrol
-    "moneycontrol": "https://www.moneycontrol.com/rss/business.xml",
-    "moneycontrol_news": "https://www.moneycontrol.com/rss/latestnews.xml",
-    "moneycontrol_markets": "https://www.moneycontrol.com/rss/marketreports.xml",
-    "moneycontrol_stocks": "https://www.moneycontrol.com/rss/stockmarket.xml",
-    
-    # Business Standard
-    "business_standard": "https://www.business-standard.com/rss/markets-106.rss",
-    "business_standard_companies": "https://www.business-standard.com/rss/companies-101.rss",
-    "business_standard_economy": "https://www.business-standard.com/rss/economy-policy-102.rss",
-    
-    # Financial Express
-    "financial_express": "https://www.financialexpress.com/market/feed/",
-    "financial_express_industry": "https://www.financialexpress.com/industry/feed/",
-    
-    # Livemint
-    "livemint": "https://www.livemint.com/rss/markets",
-    "livemint_companies": "https://www.livemint.com/rss/companies",
-    "livemint_money": "https://www.livemint.com/rss/money",
-    
-    # NDTV Profit
-    "ndtv_business": "https://feeds.feedburner.com/ndtvprofit-latest",
-    
-    # Zee Business
-    "zeebiz": "https://www.zeebiz.com/rss/markets.xml",
-    "zeebiz_personal_finance": "https://www.zeebiz.com/rss/personal-finance.xml",
-    "zeebiz_stocks": "https://www.zeebiz.com/rss/market-news.xml",
-    
-    # CNBC TV18
-    "cnbc_market": "https://www.cnbctv18.com/rss/marketnews.xml",
-    "cnbc_business": "https://www.cnbctv18.com/rss/latestnews.xml",
-    
-    # Google News
-    "google_india_business": "https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRFp0Y0RvU0FtVnVHZ0pKVGtnQVAB?hl=en-IN&gl=IN&ceid=IN:en",
-    "google_india_stocks": "https://news.google.com/rss/search?q=indian%20stocks&hl=en-IN&gl=IN&ceid=IN:en",
-    "google_sensex": "https://news.google.com/rss/search?q=sensex&hl=en-IN&gl=IN&ceid=IN:en",
-    "google_nifty": "https://news.google.com/rss/search?q=nifty&hl=en-IN&gl=IN&ceid=IN:en",
-    
-    # Business Today
-    "business_today_markets": "https://www.businesstoday.in/rss/market",
-    "business_today_companies": "https://www.businesstoday.in/rss/company",
-    
-    # BQ Prime (BloombergQuint)
-    "bq_prime_markets": "https://www.bqprime.com/markets.rss",
-    "bq_prime_business": "https://www.bqprime.com/business.rss",
-    
-    # Hindu Business Line
-    "hindu_business_line": "https://www.thehindubusinessline.com/markets/stock-markets/feeder/default.rss",
-    
-    # India Today
-    "india_today_business": "https://www.indiatoday.in/rss/1206514",
-    
-    # Times of India Business
-    "toi_business": "https://timesofindia.indiatimes.com/rssfeeds/1898055.cms",
-    
-    # Reuters
-    "reuters_india": "https://www.reuters.com/rssFeed/INbusinessNews",
-    
-    # Investing.com India
-    "investing_india": "https://www.investing.com/rss/news_301.rss",
-    
-    
 }
 
 # Global logs
@@ -638,10 +559,10 @@ def is_indian_news(title, description):
     return has_indian_context or has_indian_stocks
 
 def resolve_final_url(url):
-    """Resolve URL redirects"""
+    """Resolve URL redirects with timeout"""
     try:
         headers = {'User-Agent': 'Mozilla/5.0'}
-        response = requests.head(url, headers=headers, allow_redirects=True, timeout=10)
+        response = requests.head(url, headers=headers, allow_redirects=True, timeout=5)
         return response.url
     except:
         return url
@@ -843,14 +764,10 @@ def build_gainers_losers(sector_articles):
     add_log(f"✅ Built gainers/losers for {len(result)} sectors")
     return result
 
-# **SMART EXTRACTIVE SUMMARIZATION**
+# SMART EXTRACTIVE SUMMARIZATION
 def smart_extractive_summary(text, max_sentences=3):
     """
-    Intelligent extractive summarization based on:
-    - Financial keywords
-    - Sentence position
-    - Stock mentions
-    - Numbers and metrics
+    Intelligent extractive summarization - FAST for production
     """
     try:
         sentences = []
@@ -908,7 +825,7 @@ def smart_extractive_summary(text, max_sentences=3):
         sentences = [s.strip() for s in text.split('.') if len(s.split()) > 5]
         return '. '.join(sentences[:3]) + '.' if sentences else text[:300] + '...'
 
-# **AUTHENTICATION ROUTES**
+# AUTHENTICATION ROUTES
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -948,7 +865,7 @@ def logout():
     flash('Logged out successfully', 'info')
     return redirect(url_for('login'))
 
-# **WATCHLIST ROUTES**
+# WATCHLIST ROUTES
 @app.route('/watchlist')
 def watchlist_page():
     if 'user_id' not in session:
@@ -1102,7 +1019,7 @@ def api_get_watchlist():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# **MAIN DASHBOARD ROUTE**
+# MAIN DASHBOARD ROUTE
 @app.route("/")
 def dashboard():
     if 'user_id' not in session:
@@ -1133,7 +1050,7 @@ def dashboard():
 def api_logs():
     return jsonify({"logs": get_logs()})
 
-# **SMART SUMMARIZATION ROUTE**
+# PRODUCTION-READY SUMMARIZATION ROUTE
 @app.route("/summarize")
 def summarize_url():
     url = request.args.get("url")
@@ -1141,42 +1058,48 @@ def summarize_url():
         return jsonify({"summary": "No URL provided", "analysis_success": False})
     
     try:
+        # PRODUCTION FIX: Add timeout protection
         resolved_url = resolve_final_url(url)
         
         article_content = None
         extraction_method = "Simple"
         
+        # Try newspaper3k with timeout protection
         try:
             article = Article(resolved_url)
             article.download()
             article.parse()
             
             if article.text and len(article.text.split()) >= 30:
-                article_content = article.text
+                # PRODUCTION FIX: Limit content to prevent timeout
+                article_content = article.text[:5000]  # First 5000 chars only
                 extraction_method = "Newspaper3k"
         except Exception as e:
             add_log(f"Newspaper3k failed: {e}")
         
+        # Fallback to trafilatura
         if not article_content:
             try:
                 downloaded = trafilatura.fetch_url(resolved_url)
-                article_content = trafilatura.extract(downloaded)
-                if article_content:
-                    extraction_method = "Trafilatura"
+                if downloaded:
+                    article_content = trafilatura.extract(downloaded)
+                    if article_content:
+                        article_content = article_content[:5000]  # Limit
+                        extraction_method = "Trafilatura"
             except Exception as e:
                 add_log(f"Trafilatura failed: {e}")
         
         if not article_content or len(article_content.split()) < 30:
             return jsonify({
-                "summary": "Could not extract enough article content",
+                "summary": "Could not extract article content (timeout or parsing error)",
                 "stock_mentions": [],
                 "sentiment": "Neutral",
                 "sentiment_score": "0.50",
                 "analysis_success": False
             })
         
-        # **SMART EXTRACTIVE SUMMARIZATION**
-        add_log(f"📝 Generating smart extractive summary...")
+        # FAST SUMMARIZATION (no heavy processing)
+        add_log(f"📝 Generating summary...")
         summary_result = smart_extractive_summary(article_content, max_sentences=3)
         add_log(f"✅ Summary created ({len(summary_result.split())} words)")
         
@@ -1191,14 +1114,14 @@ def summarize_url():
             "word_count": len(article_content.split()),
             "summary_length": len(summary_result.split()),
             "extraction_method": extraction_method,
-            "summarization_method": "Smart Extractive (Keyword + Position)",
+            "summarization_method": "Smart Extractive (Production-Optimized)",
             "analysis_success": True
         })
         
     except Exception as e:
         add_log(f"❌ Summarization error: {str(e)}")
         return jsonify({
-            "summary": f"Error: {str(e)}",
+            "summary": f"Error processing article: {str(e)}",
             "stock_mentions": [],
             "sentiment": "Neutral",
             "sentiment_score": "0.50",
@@ -1207,19 +1130,22 @@ def summarize_url():
 
 
 if __name__ == "__main__":
-    add_log("🚀 Starting Stock Market Dashboard - FIXED SUMMARIZER VERSION")
+    add_log("🚀 Starting Stock Market Dashboard - PRODUCTION VERSION")
     
     print("\n" + "="*70)
     print("🇮🇳 INDIAN STOCK MARKET INTELLIGENCE DASHBOARD")
     print("="*70)
     print("🌐 Dashboard: http://localhost:5000")
     print("📊 Features:")
-    print("   ✅ Smart Extractive Summarization (NO AI models)")
-    print("   ✅ Rule-based Sentiment Analysis")
-    print("   ✅ Indian Market News Only")
-    print("   ✅ User Watchlists")
-    print("   ✅ Real-time Logs")
-    print("   ⚡ FAST & STABLE (no model loading errors)")
+    print("   ✅ Smart Extractive Summarization (Production-Ready)")
+    print("   ✅ Network Timeout Protection (15s global)")
+    print("   ✅ Content Limiting (5000 chars max)")
+    print("   ✅ Fast Processing")
+    print("   ⚡ Optimized for Waitress WSGI")
     print("="*70 + "\n")
     
-    app.run(debug=True, use_reloader=False, host='0.0.0.0', port=5000, threaded=True)
+    # For development
+    # app.run(debug=True, use_reloader=False, host='0.0.0.0', port=5000, threaded=True)
+    
+    # For production - run with:
+    # waitress-serve --host=0.0.0.0 --port=5000 --channel-timeout=120 app:app
