@@ -1143,7 +1143,9 @@ if __name__ == "__main__":
     print("   ✅ Fast Processing")
     print("   ⚡ Optimized for Waitress WSGI")
     print("="*70 + "\n")
-    
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
     # For development
     # app.run(debug=True, use_reloader=False, host='0.0.0.0', port=5000, threaded=True)
     
